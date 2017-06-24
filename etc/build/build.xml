@@ -190,12 +190,29 @@
 		<delete file="${basedir}/.tmp2.xml"/>
 
 		<echo file="${basedir}/.tmp1.js">
+			window.mxGraphViewerList = window.mxGraphViewerList || [];
 			(function()
 			{
 				Editor.initMath();
 				GraphViewer.initCss();
 				mxStencilRegistry.dynamicLoading = false;
-				
+				GraphViewer.processElements = function(classname)
+				{
+					mxUtils.forEach(GraphViewer.getElementsByClassName(classname || 'mxgraph'), function(div)
+					{
+						try
+						{
+							div.innerHTML = '';
+							GraphViewer.createViewerForElement(div, function(viewer){mxGraphViewerList.push(viewer)});
+						}
+						catch (e)
+						{
+							div.innerHTML = e.message;
+							throw e;
+						}
+					});
+				};
+
 				if (window.onDrawioViewerLoad != null)
 				{
 					window.onDrawioViewerLoad();
